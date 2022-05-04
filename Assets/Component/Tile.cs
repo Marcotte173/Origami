@@ -12,6 +12,6 @@ public class Tile : MonoBehaviour
     public Tile parent;
     public List<Tile> neighbor;
     public int cost;
-    public int terrainType;
+    public List<float> terrainType;
     public Agent occupiedBy;
 }

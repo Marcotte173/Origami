@@ -56,13 +56,4 @@ public class Utility : MonoBehaviour
         foreach (Tile t in b.tileList) if (b.terrainType == terrain) list.Add(t);
         return list;
     }
-    public bool InRange(Biome biome,int range, int terrainType, Tile t)
-    {
-        //Need to fix and make more rebust
-        for (int i = 0; i < range; i++)
-        {
-            if (Location(biome, t.x + i, t.y + j).terrainType == terrainType) return true;
-        }
-        return false;
-    }
 }

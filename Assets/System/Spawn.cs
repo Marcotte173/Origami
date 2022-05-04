@@ -9,16 +9,16 @@ public class Spawn : MonoBehaviour
     {
         instance = this;
     }
-    public void Agent(Biome b, int animalType,int x, int y)
+    public void Agent(Biome b, int animalType, int x, int y)
     {
         Agent a = Instantiate(GameObjectList.instance.agent, b.transform);
         a.transform.position = new Vector2(x, y);
         b.agentList.Add(a);
-        if(animalType == 0)
+        if (animalType == 0)
         {
             a.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.gazelle;
         }
-        else if(animalType == 1)
+        else if (animalType == 1)
         {
             a.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.bison;
         }

@@ -380,6 +380,7 @@ MonoBehaviour:
   waterPercent: 0.13
   treePercent: 0.1
   tallGrassPercent: 0.12
+  spawnPercent: 0a0000000000000000000000
   rocks: 4
   biomeX: 60
   biomeY: 60

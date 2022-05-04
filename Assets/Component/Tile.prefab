@@ -103,3 +103,25 @@ MonoBehaviour:
   parent: {fileID: 0}
   neighbor: []
   cost: 0
+  terrainType:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  occupiedBy: {fileID: 0}

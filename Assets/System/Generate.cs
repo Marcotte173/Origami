@@ -10,6 +10,7 @@ public class Generate : MonoBehaviour
     public float waterPercent;
     public float treePercent;
     public float tallGrassPercent;
+    public float creaturePercent;
     public int rocks;
     public int biomeX;
     public int biomeY;
@@ -56,30 +57,13 @@ public class Generate : MonoBehaviour
         AddTreeTerrain(a, b, biome, treePercent);
         AddWaterTerrain(a, b, biome, waterPercent);
         AddRocksTerrain(biome, rocks);
-        SpawnCreatures(biome,biomeX,biomeY,3,2,0);
+        SpawnCreatures(biome,creaturePercent);
         return biome;
     }
 
-    private void SpawnCreatures(Biome biome,int a, int b,int terrainType, int range, int creature)
+    private void SpawnCreatures(Biome biome, float x)
     {
-        int attempt = 30;
-        int creatures = 0;
-        int maxCreatures = System.Convert.ToInt32(System.Math.Sqrt(System.Convert.ToInt32(a * b * tallGrassPercent)));
-        while (creatures < maxCreatures)
-        {
-            List<Tile> possibleSpawn = new List<Tile> { };
-            foreach (Tile t in biome.tileList)
-            {
-                if (t.terrainType == terrainType || (Utility.instance.InRange(biome,range, terrainType, t) && t.terrainType == biome.terrainType))
-                    possibleSpawn.Add(t);
-            }
-            Tile spawn = possibleSpawn[Random.Range(0, possibleSpawn.Count)];
-            possibleSpawn.Remove(spawn);
-            Spawn.instance.Agent(biome, creature, spawn.x, spawn.y);
-            creatures++;
-            attempt--;
-            if (attempt <= 0 || possibleSpawn.Count <= 1) break;
-        }
+        int creatures = System.Convert.ToInt32(biomeX * biomeY * x);
     }
 
     private void AddRocksTerrain(Biome biome, int rocks)
@@ -98,7 +82,7 @@ public class Generate : MonoBehaviour
 
     private void MakeARock(Biome biome, int x, int y, int v)
     {
-        Utility.instance.Location(biome, x, y).terrainType = 4;
+        Utility.instance.Location(biome, x, y).terrainType[3] = 1;
         Utility.instance.Location(biome, x, y).GetComponent<SpriteRenderer>().sprite = SpriteList.instance.rocks[v];
     }
 
@@ -153,7 +137,7 @@ public class Generate : MonoBehaviour
         {
             foreach (Tile newTile in tile.neighbor)
             {
-                if (newTile.terrainType == 0 && tile.terrainType !=0)
+                if (newTile.terrainType[0] == 1 && tile.terrainType[0] !=1)
                 {
                     UpdateTerrain(tile, 5);
                     break;
@@ -190,7 +174,7 @@ public class Generate : MonoBehaviour
         {
             for (int j = 0; j < amountX; j++)
             {
-                if (Utility.instance.Location(b, t.x + j, t.y + i).terrainType != b.terrainType) return false;
+                if (Utility.instance.Location(b, t.x + j, t.y + i).terrainType[b.terrainType]!=1) return false;
             }
         }
         return true;
@@ -236,31 +220,37 @@ public class Generate : MonoBehaviour
     }
 
     private void UpdateTerrain(Tile l,int terrainType)
-    {
-        l.terrainType = terrainType;
-        if(l.terrainType == 0)
+    {        
+        if (terrainType == 0)
         {
+            l.terrainType = new List<float> {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            l.terrainType[terrainType] = 1;
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.water[Random.Range(0, SpriteList.instance.water.Count)];
         }
-        if(l.terrainType == 1)
+        if(terrainType == 1)
         {
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.grass[Random.Range(0, SpriteList.instance.grass.Count)];
+            l.terrainType[terrainType] = 1;
         }
-        if (l.terrainType == 2)
+        if (terrainType == 2)
         {
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.trees[Random.Range(0, SpriteList.instance.trees.Count)];
+            l.terrainType[terrainType] = 1;
         }
-        if (l.terrainType == 3)
+        if (terrainType == 3)
         {
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.tallGrass[Random.Range(0, SpriteList.instance.tallGrass.Count)];
+            l.terrainType[terrainType] = 1;
         }
-        if (l.terrainType == 4)
+        if (terrainType == 4)
         {
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.rocks[Random.Range(0, SpriteList.instance.rocks.Count)];
+            l.terrainType[terrainType] = 1;
         }
-        if (l.terrainType == 5)
+        if (terrainType == 5)
         {
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.sand;
+            l.terrainType[terrainType] = 1;
         }
     }
 
@@ -282,14 +272,14 @@ public class Generate : MonoBehaviour
     {
         foreach (Tile t in biome.tileList.ToList())
         {
-            if (t.terrainType == terrainType)
+            if (t.terrainType[terrainType] == 1)
             {
                 foreach (Tile n in t.neighbor)
                 {
-                    if (n.terrainType != terrainType)
+                    if (n.terrainType[terrainType]!=1)
                     {
                         int terrainNeighbors = 0;
-                        foreach (Tile w in n.neighbor) if (w.terrainType == terrainType) terrainNeighbors++;
+                        foreach (Tile w in n.neighbor) if (w.terrainType[terrainType] ==1) terrainNeighbors++;
                         int roll = Random.Range(1, 101);
                         if (roll < terrainNeighbors * edgeLikelyHood)
                         {
