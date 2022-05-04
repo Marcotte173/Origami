@@ -380,7 +380,15 @@ MonoBehaviour:
   waterPercent: 0.13
   treePercent: 0.1
   tallGrassPercent: 0.12
-  spawnPercent: 0a0000000000000000000000
+  creaturePercent: 0.01
+  terrainExtensionIteration: 000000000000000003000000050000000000000005000000
+  terrainExtensionPercentage:
+  - 0
+  - 0
+  - 0.4
+  - 0.6
+  - 0
+  - 1
   rocks: 4
   biomeX: 60
   biomeY: 60

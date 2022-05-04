@@ -11,6 +11,8 @@ public class Generate : MonoBehaviour
     public float treePercent;
     public float tallGrassPercent;
     public float creaturePercent;
+    public List<int> terrainExtensionIteration;
+    public List<float> terrainExtensionPercentage;
     public int rocks;
     public int biomeX;
     public int biomeY;
@@ -48,7 +50,7 @@ public class Generate : MonoBehaviour
     private Biome BuildGrassBiome(int a, int b, int terrainType)
     {
         Biome biome = NewBiome(a, b, terrainType);
-        ArtisinalTerrain(b, terrainType);
+        ArtisinalTerrain(biome, terrainType);
         biome.terrainType = terrainType;
         World.instance.world.Add(biome);
         biome.id = World.instance.world.Count;
@@ -64,6 +66,13 @@ public class Generate : MonoBehaviour
     private void SpawnCreatures(Biome biome, float x)
     {
         int creatures = System.Convert.ToInt32(biomeX * biomeY * x);
+        while (creatures > 0)
+        {
+            Tile t = Utility.instance.Location(biome,Random.Range(0, biomeX), Random.Range(0, biomeY));
+            if (t.terrainType[0] == 1 || t.terrainType[4] == 1) continue;
+            Spawn.instance.Agent(biome,t);
+            creatures--;
+        }
     }
 
     private void AddRocksTerrain(Biome biome, int rocks)
@@ -180,7 +189,7 @@ public class Generate : MonoBehaviour
         return true;
     }
 
-    private void ArtisinalTerrain(int b, int terrainType)
+    private void ArtisinalTerrain(Biome b, int terrainType)
     {
         
     }
@@ -220,38 +229,66 @@ public class Generate : MonoBehaviour
     }
 
     private void UpdateTerrain(Tile l,int terrainType)
-    {        
+    {
         if (terrainType == 0)
         {
-            l.terrainType = new List<float> {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            for (int i = 0; i < l.terrainType.Count; i++) l.terrainType[i] = 0;
             l.terrainType[terrainType] = 1;
             l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.water[Random.Range(0, SpriteList.instance.water.Count)];
         }
-        if(terrainType == 1)
+        else
         {
-            l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.grass[Random.Range(0, SpriteList.instance.grass.Count)];
-            l.terrainType[terrainType] = 1;
+            List<Tile> tiles = new List<Tile> { };
+            tiles.Add(l);
+            for (int i = 0; i < terrainExtensionIteration[terrainType]; i++)
+            {
+                foreach (Tile tile in tiles.ToList())
+                {
+                    foreach (Tile n in tile.neighbor)
+                    {
+                        if (!tiles.Contains(n)&& n.terrainType[0] != 1&&n.terrainType[terrainType] != 1)
+                        {
+                            n.terrainType[terrainType] = terrainExtensionPercentage[terrainType]/ i;
+                            tiles.Add(n);
+                        }
+                    }
+                }
+            }
+            if (terrainType == 1)
+            {
+                l.terrainType[terrainType] = 1;
+                l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.grass[Random.Range(0, SpriteList.instance.grass.Count)];
+            }
+            if (terrainType == 2)
+            {
+                l.terrainType[0] = 0;
+                for (int i = 0; i < l.terrainType.Count; i++) if (l.terrainType[i] == 1) l.terrainType[i] = .5f;
+                l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.trees[Random.Range(0, SpriteList.instance.trees.Count)];
+                l.terrainType[terrainType] = 1;
+
+            }
+            if (terrainType == 3)
+            {
+                l.terrainType[0] = 0;
+                for(int i = 0; i < l.terrainType.Count; i++) if (l.terrainType[i] == 1) l.terrainType[i] = .5f;
+                l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.tallGrass[Random.Range(0, SpriteList.instance.tallGrass.Count)];
+                l.terrainType[terrainType] = 1;
+            }
+            if (terrainType == 4)
+            {
+                l.terrainType[0] = 0;
+                for(int i = 0; i < l.terrainType.Count; i++) if (l.terrainType[i] == 1) l.terrainType[i] = .5f;
+                l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.rocks[Random.Range(0, SpriteList.instance.rocks.Count)];
+                l.terrainType[terrainType] = 1;
+            }
+            if (terrainType == 5)
+            {
+                for(int i = 0; i < l.terrainType.Count; i++) if (l.terrainType[i] == 1) l.terrainType[i] = .5f;
+                l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.sand;
+                l.terrainType[terrainType] = 1;
+            }
         }
-        if (terrainType == 2)
-        {
-            l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.trees[Random.Range(0, SpriteList.instance.trees.Count)];
-            l.terrainType[terrainType] = 1;
-        }
-        if (terrainType == 3)
-        {
-            l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.tallGrass[Random.Range(0, SpriteList.instance.tallGrass.Count)];
-            l.terrainType[terrainType] = 1;
-        }
-        if (terrainType == 4)
-        {
-            l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.rocks[Random.Range(0, SpriteList.instance.rocks.Count)];
-            l.terrainType[terrainType] = 1;
-        }
-        if (terrainType == 5)
-        {
-            l.GetComponent<SpriteRenderer>().sprite = SpriteList.instance.sand;
-            l.terrainType[terrainType] = 1;
-        }
+        
     }
 
     public void  MakeTerrain(Biome biome,int howBig,Tile where,int terrainType)
